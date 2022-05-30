@@ -12,6 +12,9 @@ line_bot_api = LineBotApi(
     "AM82YvNzOu37BSjeLy5LtvUbDZIdwssqEU4kTuTg7aDEUfrE9MqVoLhAqAT4H43Ggk5Bo9qC2mRRypGGhXpr694K+yxLf7IO7eIK5+CWaKLbsqKz2osEOR5QASQ7RPyjL0EOOV+MfsbDKP1fH3B9CwdB04t89/1O/w1cDnyilFU=")
 handler = WebhookHandler("bffecec9ba651ad932eaf02906ea659c")
 
+@app.route("/")
+def home():
+    return "Flask with heroku"
 
 @app.route("/callback", methods=['POST'])
 def callback():
