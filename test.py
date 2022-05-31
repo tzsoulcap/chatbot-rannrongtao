@@ -21,6 +21,99 @@ data = sheet.get_all_records()  # การรับรายการของ�
 line_bot_api = LineBotApi(
     "AM82YvNzOu37BSjeLy5LtvUbDZIdwssqEU4kTuTg7aDEUfrE9MqVoLhAqAT4H43Ggk5Bo9qC2mRRypGGhXpr694K+yxLf7IO7eIK5+CWaKLbsqKz2osEOR5QASQ7RPyjL0EOOV+MfsbDKP1fH3B9CwdB04t89/1O/w1cDnyilFU=")
 
+def SoleService(reply_token, id):
+    flex = """
+    {
+   "type":"bubble",
+   "header":{
+      "type":"box",
+      "layout":"vertical",
+      "contents":[
+         {
+            "type":"box",
+            "layout":"horizontal",
+            "contents":[
+               {
+                  "type":"image",
+                  "url":"https://cdn.shopify.com/s/files/1/0225/9891/products/AJ1-CLOSE-SP-SQ-2A_650x.jpg",
+                  "size":"full",
+                  "aspectMode":"cover",
+                  "aspectRatio":"150:196",
+                  "gravity":"center",
+                  "flex":1
+               },
+               {
+                  "type":"box",
+                  "layout":"vertical",
+                  "contents":[
+                     {
+                        "type":"image",
+                        "url":"https://cdn.shopify.com/s/files/1/0225/9891/products/BIOSHOCK-WEB-2_650x.jpg?v=1633442791",
+                        "size":"full",
+                        "aspectMode":"cover",
+                        "aspectRatio":"150:98",
+                        "gravity":"center"
+                     },
+                     {
+                        "type":"image",
+                        "url":"https://cdn.shopify.com/s/files/1/0225/9891/products/BIOSHOCK-WEB-1_650x.jpg?v=1633442794",
+                        "size":"full",
+                        "aspectMode":"cover",
+                        "aspectRatio":"150:98",
+                        "gravity":"center"
+                     }
+                  ],
+                  "flex":1
+               }
+            ]
+         }
+      ],
+      "paddingAll":"0px"
+      }
+    }""" 
+    flex = json.loads(flex)
+    flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
+    line_bot_api.reply_message(reply_token, flex)
+
+    text_message = TextSendMessage(
+        text='เลือกช่องทางการบริการ',
+        quick_reply=QuickReply(
+          items=[
+            QuickReplyButton(
+              action=MessageAction(label="จองเวลาบริการที่ร้าน", text="จองเวลาบริการที่ร้าน")
+            ),
+            QuickReplyButton(
+              action=MessageAction(label="ส่งรองเท้าไปที่ร้าน", text="ส่งรองเท้าไปที่ร้าน")
+            )
+          ]
+        )
+    )
+    line_bot_api.push_message(id, text_message)
+
+def reserveService(reply_token):
+    text_message = TextSendMessage(text='เลือกช่องทางการบริการ', 
+        quick_reply=QuickReply(
+          items=[
+            QuickReplyButton(
+              action=
+                DatetimePickerAction(
+                  label="จองเวลาบริการที่ร้าน", 
+                  data="time=1234", 
+                  mode="datetime",
+                  initial="2022-05-31T00:00", 
+                  max="2022-08-31T23:59", 
+                  min="2022-01-31T00:00"),
+                  
+            ),
+            QuickReplyButton(
+              action=
+                PostbackAction(label="เวลา", data="time=1234", display_text="TIME")
+            )
+        ])
+    )
+    line_bot_api.reply_message(reply_token, text_message)
+    
+
 
 def showBuyDetail(intent, reply_token, product, size, id):
     rows = sheet.find(product)

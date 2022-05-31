@@ -74,6 +74,10 @@ def callback():
         # print(orderID)
         test.CheckStatus(reply_token, orderID)
 
+    elif intent == 'Sole Shields':
+        test.SoleService(reply_token, id)
+    #     test.reserveService(reply_token)
+
     return 'OK'
 
 
