@@ -8,6 +8,7 @@ import re
 from linebot.models import *
 from linebot import *
 import time
+from datetime import datetime
 
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
          "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
@@ -17,12 +18,53 @@ sheet = client.open("RannRongTao").worksheet(
     'Stock')  # เป็นการเปิดไปยังหน้าชีตนั้นๆ
 order_sheet = client.open("RannRongTao").worksheet(
     'Order')
+sheet_service = client.open("RannRongTao").worksheet(
+    'ReserveService')
 data = sheet.get_all_records()  # การรับรายการของระเบียนทั้งหมด
 line_bot_api = LineBotApi(
     "AM82YvNzOu37BSjeLy5LtvUbDZIdwssqEU4kTuTg7aDEUfrE9MqVoLhAqAT4H43Ggk5Bo9qC2mRRypGGhXpr694K+yxLf7IO7eIK5+CWaKLbsqKz2osEOR5QASQ7RPyjL0EOOV+MfsbDKP1fH3B9CwdB04t89/1O/w1cDnyilFU=")
 
-def SoleService(reply_token, id):
-    flex = """
+def SentShoes(reply_token):
+    text_message = TextMessage(text="""ลูกค้าสามารถส่งรองเท้ามาตามที่อยู่ร้านได้เลยค่ะ
+        ที่อยู่ร้าน Rann Rong Tao  105/577 หมู่ 6 ตำบล สุรนารี อำเภอ เมือง จังหวัดนครราชสีมา 30000""")
+    line_bot_api.reply_message(reply_token, text_message)
+
+def ReserveService(reply_token, datestr, timestr, service, disname):
+    t = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S%z")
+    d = datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%S%z")
+    dom = int(datetime.strftime(d, "%d"))
+    times = datetime.strftime(t, "%H:%M")
+    date = datetime.strftime(d, "%w")
+
+    def week(dd):
+      switcher = {
+        "0": "วันอาทิตย์",
+        "1": "วันจันทร์",
+        "2": "วันอังคาร",
+        "3": "วันพุธ",
+        "4": "วันพฤหัสบดี",
+        "5": "วันศุกร์",
+        "6": "วันเสาร์"
+      }
+      return switcher.get(dd)
+    date = week(date)
+    date_time = f"คุณ {disname} ได้จองบริการ{service}ที่ร้าน {date} ที่ {dom} เวลา {times} น."
+
+    text_message = TextMessage(text=date_time)
+    line_bot_api.reply_message(reply_token, text_message)
+
+    date = datetime.strftime(d, "%d/%m/%Y")
+    timestamp = datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M")
+
+    detail = [service, date, times, timestamp, disname]
+    last = sheet_service.find("Last Record")
+    sheet_service.update(f"A{last.row}:E{last.row}", [detail])
+    sheet_service.update_cell(last.row+1, last.col, "Last Record")
+
+def Service(reply_token, id, intent):
+    if intent == "Sole Shields":
+
+      flex = """
     {
    "type":"bubble",
    "header":{
@@ -71,9 +113,9 @@ def SoleService(reply_token, id):
       "paddingAll":"0px"
       }
     }""" 
-    flex = json.loads(flex)
-    flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
-    line_bot_api.reply_message(reply_token, flex)
+      flex = json.loads(flex)
+      flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
+      line_bot_api.reply_message(reply_token, flex)
 
     text_message = TextSendMessage(
         text='เลือกช่องทางการบริการ',
@@ -89,30 +131,6 @@ def SoleService(reply_token, id):
         )
     )
     line_bot_api.push_message(id, text_message)
-
-def reserveService(reply_token):
-    text_message = TextSendMessage(text='เลือกช่องทางการบริการ', 
-        quick_reply=QuickReply(
-          items=[
-            QuickReplyButton(
-              action=
-                DatetimePickerAction(
-                  label="จองเวลาบริการที่ร้าน", 
-                  data="time=1234", 
-                  mode="datetime",
-                  initial="2022-05-31T00:00", 
-                  max="2022-08-31T23:59", 
-                  min="2022-01-31T00:00"),
-                  
-            ),
-            QuickReplyButton(
-              action=
-                PostbackAction(label="เวลา", data="time=1234", display_text="TIME")
-            )
-        ])
-    )
-    line_bot_api.reply_message(reply_token, text_message)
-    
 
 
 def showBuyDetail(intent, reply_token, product, size, id):

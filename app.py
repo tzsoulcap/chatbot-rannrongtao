@@ -58,6 +58,7 @@ def callback():
                 product = item["parameters"]["ProductName"]
                 size = item["parameters"]["Size"]
                 # size = item["parameters"]["Sizing"]
+            break
 
         # product = req["queryResult"]["outputContexts"][0]["parameters"]["ProductName"]
         # size = req["queryResult"]["outputContexts"][0]["parameters"]["Size"]
@@ -74,9 +75,23 @@ def callback():
         # print(orderID)
         test.CheckStatus(reply_token, orderID)
 
-    elif intent == 'Sole Shields':
-        test.SoleService(reply_token, id)
+    elif intent == 'Sole Shields' or intent == 'Shoes Spa':
+        test.Service(reply_token, id, intent)
     #     test.reserveService(reply_token)
+
+    elif intent == 'Confirm Reserve':
+        for item in req["queryResult"]["outputContexts"]:
+            if re.search("soleshields-followup", item["name"]):
+                service = item["parameters"]["Service"]
+
+            break
+
+        time = req["queryResult"]["parameters"]["time"]
+        date = req["queryResult"]["parameters"]["date"]
+        test.ReserveService(reply_token, date, time, service, disname)
+
+    elif intent == 'Send Shoes to The Shop':
+        test.SentShoes(reply_token)
 
     return 'OK'
 
