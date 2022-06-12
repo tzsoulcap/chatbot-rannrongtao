@@ -24,37 +24,54 @@ data = sheet.get_all_records()  # การรับรายการของ�
 line_bot_api = LineBotApi(
     "AM82YvNzOu37BSjeLy5LtvUbDZIdwssqEU4kTuTg7aDEUfrE9MqVoLhAqAT4H43Ggk5Bo9qC2mRRypGGhXpr694K+yxLf7IO7eIK5+CWaKLbsqKz2osEOR5QASQ7RPyjL0EOOV+MfsbDKP1fH3B9CwdB04t89/1O/w1cDnyilFU=")
 
-def RecommendProduct(reply_token):
-    image_carousel_template_message = TemplateSendMessage(
-    alt_text='ImageCarousel template',
-    template=ImageCarouselTemplate(
-        columns=[
-            ImageCarouselColumn(
-                image_url='https://static.nike.com/a/images/t_prod_ss/w_960,c_limit,f_auto/i1-035eca0f-e3ff-4d69-ac4f-ec5015ef643f/-air-jordan-1-court-purple.jpg',
-                action=MessageAction(
-                    label='สั่งซื้อ1',
-                    text='สั่งซื้อ1'
-                )
-            ),
-            ImageCarouselColumn(
-                image_url='https://static.nike.com/a/images/t_prod_ss/w_640,c_limit,f_auto/hl5u7kku1dlurbgborm6/air-jordan-4-travis-scott-cactus-jack-release-date.jpg',
-                action=MessageAction(
-                    label='สั่งซื้อ2',
-                    text='สั่งซื้อ2'
-                )
-            )
-        ]
-    )
-)
 
-   
+def HowtoUse(id, reply_token):
+    video_message = VideoSendMessage(
+    original_content_url='https://player.vimeo.com/progressive_redirect/playback/719564103/rendition/720p/file.mp4?loc=external&signature=1caa2935ea7687518c249d0c5823f2e35f69c606b3e5ec89778fbf2bb4a4f16d',
+    preview_image_url='https://i.pinimg.com/564x/c8/b3/b1/c8b3b1d085cda402517078e60bb51a34.jpg'
+    )
+
+    text_message = TextMessage(text='สวัสดีค่ะ วิธีการสั่งซื้อของร้าน "Rann Rong Tao" เป็นดังตัวอย่างในวิดีโอด้านล่างนี้ค่ะ')
+    line_bot_api.push_message(id, text_message)
+    
+    line_bot_api.reply_message(reply_token, video_message)
+
+
+
+def RecommendProduct(reply_token):
+    d = sorted(data, key=lambda val: val['ยอดขาย'], reverse=True)
+    item = d[0:3]
+    items = []
+    for i in range(len(item)):
+        items.append([item[i]['ชื่อสินค้า'], item[i]['Img Link']])
+
+    columns = []
+    for i in items:
+        columns.append(ImageCarouselColumn(
+            image_url=i[1],
+            action=MessageAction(
+                label='สั่งซื้อ',
+                text=i[0]
+            )
+        ))
+
+
+
+    image_carousel_template_message = TemplateSendMessage(
+        alt_text='ImageCarousel template',
+        template=ImageCarouselTemplate(
+            columns=columns
+
+        )
+    )
+
     line_bot_api.reply_message(reply_token, image_carousel_template_message)
 
 
 def SentShoes(reply_token):
-    text_message = TextMessage(text="""ลูกค้าสามารถส่งรองเท้ามาตามที่อยู่ร้านได้เลยค่ะ
-        ที่อยู่ร้าน Rann Rong Tao  105/577 หมู่ 6 ตำบล สุรนารี อำเภอ เมือง จังหวัดนครราชสีมา 30000""")
+    text_message = TextMessage(text="""ลูกค้าสามารถส่งรองเท้ามาตามที่อยู่ร้านได้เลยค่ะ\nที่อยู่ร้าน Rann Rong Tao  105/577 หมู่ 6 ตำบล สุรนารี อำเภอ เมือง จังหวัดนครราชสีมา 30000""")
     line_bot_api.reply_message(reply_token, text_message)
+
 
 def ReserveService(reply_token, datestr, timestr, service, disname):
     t = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S%z")
@@ -64,16 +81,16 @@ def ReserveService(reply_token, datestr, timestr, service, disname):
     date = datetime.strftime(d, "%w")
 
     def week(dd):
-      switcher = {
-        "0": "วันอาทิตย์",
-        "1": "วันจันทร์",
-        "2": "วันอังคาร",
-        "3": "วันพุธ",
-        "4": "วันพฤหัสบดี",
-        "5": "วันศุกร์",
-        "6": "วันเสาร์"
-      }
-      return switcher.get(dd)
+        switcher = {
+            "0": "วันอาทิตย์",
+            "1": "วันจันทร์",
+            "2": "วันอังคาร",
+            "3": "วันพุธ",
+            "4": "วันพฤหัสบดี",
+            "5": "วันศุกร์",
+            "6": "วันเสาร์"
+        }
+        return switcher.get(dd)
     date = week(date)
     date_time = f"คุณ {disname} ได้จองบริการ{service}ที่ร้าน {date} ที่ {dom} เวลา {times} น."
 
@@ -88,10 +105,11 @@ def ReserveService(reply_token, datestr, timestr, service, disname):
     sheet_service.update(f"A{last.row}:E{last.row}", [detail])
     sheet_service.update_cell(last.row+1, last.col, "Last Record")
 
+
 def Service(reply_token, id, intent):
     if intent == "Sole Shields":
 
-      flex = """
+        flex = """
     {
    "type":"bubble",
    "header":{
@@ -139,22 +157,38 @@ def Service(reply_token, id, intent):
       ],
       "paddingAll":"0px"
       }
-    }""" 
-      flex = json.loads(flex)
-      flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
-      line_bot_api.reply_message(reply_token, flex)
+    }"""
+        flex = json.loads(flex)
+        flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
+        line_bot_api.reply_message(reply_token, flex)
+
+        text_message = TextSendMessage(text='''✨บริการติดโซลรองเท้าราคา 550฿\n✨รับติดหลายรุ่น Yeezy Jordan Nike และอื่นๆ''')
+        line_bot_api.push_message(id, text_message)
+
+    else:
+        image_message = ImageSendMessage(
+            original_content_url='https://ayasansite.files.wordpress.com/2017/03/sneaker-white.jpg',
+            preview_image_url='https://ayasansite.files.wordpress.com/2017/03/sneaker-white.jpg'
+        )
+        line_bot_api.reply_message(reply_token, image_message)
+
+        text_message = TextSendMessage(text='''✨บริการทำความสะอาดรองเท้า ครบวงจร \n🛁 สปา ทำสี เคลือบ ซ่อม \n💰ค่าบริการ เริ่ม 590฿''')
+        line_bot_api.push_message(id, text_message)
+
 
     text_message = TextSendMessage(
         text='เลือกช่องทางการบริการ',
         quick_reply=QuickReply(
-          items=[
-            QuickReplyButton(
-              action=MessageAction(label="จองเวลาบริการที่ร้าน", text="จองเวลาบริการที่ร้าน")
-            ),
-            QuickReplyButton(
-              action=MessageAction(label="ส่งรองเท้าไปที่ร้าน", text="ส่งรองเท้าไปที่ร้าน")
-            )
-          ]
+            items=[
+                QuickReplyButton(
+                    action=MessageAction(
+                        label="จองเวลาบริการที่ร้าน", text="จองเวลาบริการที่ร้าน")
+                ),
+                QuickReplyButton(
+                    action=MessageAction(
+                        label="ส่งรองเท้าไปที่ร้าน", text="ส่งรองเท้าไปที่ร้าน")
+                )
+            ]
         )
     )
     line_bot_api.push_message(id, text_message)
@@ -303,7 +337,8 @@ def showItem(intent, reply_token, brand, id):
         carousel_col.append(CarouselColumn(
             thumbnail_image_url=imglinks[i],
             title=names[i],
-            text='{}\nSize: {}\nขายแล้ว {}'.format(prices[i], '/'.join(sizes[i]), amounts[i]),
+            text='{}\nSize: {}\nขายแล้ว {}'.format(
+                prices[i], '/'.join(sizes[i]), amounts[i]),
             actions=[
                 MessageAction(
                     label='เลือกไซส์',
@@ -318,12 +353,12 @@ def showItem(intent, reply_token, brand, id):
             columns=carousel_col
         )
     )
-    
+
     line_bot_api.reply_message(reply_token, carousel_template_message)
     # line_bot_api.push_message(uid, carousel_template_message)
 
 
-def ShippingAddress(reply_token, product, size, customer, address, zip_code, phone_no):
+def ShippingAddress(id, reply_token, product, size, customer, address, zip_code, phone_no):
     # line_bot_api.reply_message(
     #     reply_token, TextSendMessage(text='การซื้อสำเร็จ'))
 
@@ -526,16 +561,25 @@ def ShippingAddress(reply_token, product, size, customer, address, zip_code, pho
       }
     ]
   }
-}""" %(imglink, orderID, product, size, price, address, zip_code, customer, phone_no)
+}""" % (imglink, orderID, product, size, price, address, zip_code, customer, phone_no)
     flex = json.loads(flex)
     flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)
     line_bot_api.reply_message(reply_token, flex)
 
-    order_detail = [orderID, "Processing", product, size, price, customer, phone_no, address, zip_code]
+    sticker_message = StickerSendMessage(
+        package_id='6359',
+        sticker_id='11069856'
+    )
+
+    line_bot_api.push_message(id, sticker_message)
+
+    order_detail = [orderID, "Processing", product, size,
+                    price, customer, phone_no, address, zip_code]
 
     last = order_sheet.find("Last Order")
     order_sheet.update(f"A{last.row}:I{last.row}", [order_detail])
     order_sheet.update_cell(last.row+1, last.col, "Last Order")
+
 
 def CheckStatus(reply_token, orderID):
     cells = order_sheet.find(orderID)
@@ -907,7 +951,7 @@ def CheckStatus(reply_token, orderID):
       }
     ]
   }
-}""" %(orderID, product, size, customer, address, zip_code, phone_no)
+}""" % (orderID, product, size, customer, address, zip_code, phone_no)
     flex = json.loads(flex, strict=False)
 
     flex = FlexSendMessage(alt_text='Flex Message alt text', contents=flex)

@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from flask import Flask, request
 from linebot.models import *
 from linebot import *
@@ -36,11 +37,18 @@ def callback():
     print('intent = ' + intent)
     print('reply_token = ' + reply_token)
 
-    
+
 
     if intent == 'SelectBrands':
+
         brand = req["queryResult"]["parameters"]["Brands"]
-        test.showItem(intent, reply_token, brand, id)
+        product = req["queryResult"]["parameters"]["ProductName"]
+        if brand != "":
+            test.showItem(intent, reply_token, brand, id)
+        else:
+            test.showItem(intent, reply_token, product, id)
+
+
 
     elif intent == 'SelectSizes':
         product = req["queryResult"]["parameters"]["ProductName"]
@@ -68,7 +76,7 @@ def callback():
         address = req["queryResult"]["parameters"]["address"]
         zip_code = req["queryResult"]["parameters"]["zip-code"]
         phone_no = req["queryResult"]["parameters"]["phone-number"]
-        test.ShippingAddress(reply_token, product, size, customer, address, zip_code, phone_no)
+        test.ShippingAddress(id, reply_token, product, size, customer, address, zip_code, phone_no)
 
     elif intent == 'Order Number':
         orderID = req["queryResult"]["parameters"]["OrderID"]
@@ -95,6 +103,9 @@ def callback():
 
     elif intent == 'Recommend Products':
         test.RecommendProduct(reply_token)
+
+    elif intent == 'How To Use':
+        test.HowtoUse(id, reply_token)
 
     return 'OK'
 
