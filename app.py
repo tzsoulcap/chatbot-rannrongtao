@@ -58,7 +58,7 @@ def callback():
                 product = item["parameters"]["ProductName"]
                 size = item["parameters"]["Size"]
                 # size = item["parameters"]["Sizing"]
-            break
+                break
 
         # product = req["queryResult"]["outputContexts"][0]["parameters"]["ProductName"]
         # size = req["queryResult"]["outputContexts"][0]["parameters"]["Size"]
@@ -92,6 +92,9 @@ def callback():
 
     elif intent == 'Send Shoes to The Shop':
         test.SentShoes(reply_token)
+
+    elif intent == 'Recommend Products':
+        test.RecommendProduct(reply_token)
 
     return 'OK'
 

@@ -35,8 +35,8 @@ data = sheet.get_all_records()  # การรับรายการของ�
 # val = sheet.get('A2:A9')
 # print(val)
 
-# cells = order_sheet.find('20220512220301')
-# item = order_sheet.row_values(cells.row)
+# cells = sheet.find('Jordan 1 Retro High Dark Mocha')
+# item = sheet.row_values(cells.row)
 # print(item)
 # datestr = "2022-06-02T12:00:00+07:00"
 # timestr = "2022-06-02T12:30:00+07:00"
@@ -63,6 +63,106 @@ data = sheet.get_all_records()  # การรับรายการของ�
 # date_time = f"{date} ที่ {dom} เวลา {times} น."
 # print(date_time)
 
-date = datetime.now()
-datestr = datetime.strftime(date, "%d-%m-%Y %H:%M")
-print(datestr)
+# date = datetime.now()
+# datestr = datetime.strftime(date, "%d-%m-%Y %H:%M")
+# print(datestr)
+
+r = re.compile(r'{}'.format("Nike"), re.IGNORECASE)
+d = sheet.findall(r, None, 2)
+
+items = [sheet.row_values(cell.row) for cell in d]
+codes, names, stocks, prices, sizes, imglinks, amount = [], [], [], [], [], [], []
+for item in items:
+    codes.append(item[0])
+    names.append(item[1])
+    stocks.append(item[2])
+    prices.append(item[3])
+    sizes.append(item[4].split(' '))
+    imglinks.append(item[5])
+    amount.append(item[6])
+contents = []
+
+for i in range(len(prices)):
+    if i == 3:
+        break
+    content = {
+      "type": "bubble",
+      "hero": {
+        "type": "image",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "url": imglinks[i]
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": names[i],
+            "wrap": True,
+            "weight": "bold",
+            "size": "xl"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": prices[i],
+                "wrap": True,
+                "weight": "regular",
+                "size": "xl",
+                "flex": 0
+              },
+              {
+                "type": "text",
+                "text": "ขายแล้ว "+amount[i],
+                "wrap": True,
+                "weight": "regular",
+                "size": "md",
+                "margin": "140px"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Size: "+"/".join(sizes[i])
+              }
+            ]
+          }
+        ],
+        "margin": "none"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "button",
+            "style": "primary",
+            "action": {
+              "type": "message",
+              "label": "เลือกไซส์",
+              "text": "เลือกไซส์ "+names[i]
+            }
+          }
+        ]
+      }
+    }
+
+    contents.append(content)
+flex = {
+  "type": "carousel",
+  "contents": contents
+}
+flex = f"\"{flex}\""
+print(flex)

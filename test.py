@@ -24,6 +24,33 @@ data = sheet.get_all_records()  # การรับรายการของ�
 line_bot_api = LineBotApi(
     "AM82YvNzOu37BSjeLy5LtvUbDZIdwssqEU4kTuTg7aDEUfrE9MqVoLhAqAT4H43Ggk5Bo9qC2mRRypGGhXpr694K+yxLf7IO7eIK5+CWaKLbsqKz2osEOR5QASQ7RPyjL0EOOV+MfsbDKP1fH3B9CwdB04t89/1O/w1cDnyilFU=")
 
+def RecommendProduct(reply_token):
+    image_carousel_template_message = TemplateSendMessage(
+    alt_text='ImageCarousel template',
+    template=ImageCarouselTemplate(
+        columns=[
+            ImageCarouselColumn(
+                image_url='https://static.nike.com/a/images/t_prod_ss/w_960,c_limit,f_auto/i1-035eca0f-e3ff-4d69-ac4f-ec5015ef643f/-air-jordan-1-court-purple.jpg',
+                action=MessageAction(
+                    label='สั่งซื้อ1',
+                    text='สั่งซื้อ1'
+                )
+            ),
+            ImageCarouselColumn(
+                image_url='https://static.nike.com/a/images/t_prod_ss/w_640,c_limit,f_auto/hl5u7kku1dlurbgborm6/air-jordan-4-travis-scott-cactus-jack-release-date.jpg',
+                action=MessageAction(
+                    label='สั่งซื้อ2',
+                    text='สั่งซื้อ2'
+                )
+            )
+        ]
+    )
+)
+
+   
+    line_bot_api.reply_message(reply_token, image_carousel_template_message)
+
+
 def SentShoes(reply_token):
     text_message = TextMessage(text="""ลูกค้าสามารถส่งรองเท้ามาตามที่อยู่ร้านได้เลยค่ะ
         ที่อยู่ร้าน Rann Rong Tao  105/577 หมู่ 6 ตำบล สุรนารี อำเภอ เมือง จังหวัดนครราชสีมา 30000""")
@@ -255,7 +282,7 @@ def showItem(intent, reply_token, brand, id):
     d = sheet.findall(r, None, 2)
 
     items = [sheet.row_values(cell.row) for cell in d]
-    codes, names, stocks, prices, sizes, imglinks = [], [], [], [], [], []
+    codes, names, stocks, prices, sizes, imglinks, amounts = [], [], [], [], [], [], []
     for item in items:
         codes.append(item[0])
         names.append(item[1])
@@ -263,6 +290,7 @@ def showItem(intent, reply_token, brand, id):
         prices.append(item[3])
         sizes.append(item[4].split(' '))
         imglinks.append(item[5])
+        amounts.append(item[6])
 
     text_message = TextSendMessage(
         text='นี่คือสินค้า {} ในร้านเราค่ะ'.format(brand))
@@ -275,7 +303,7 @@ def showItem(intent, reply_token, brand, id):
         carousel_col.append(CarouselColumn(
             thumbnail_image_url=imglinks[i],
             title=names[i],
-            text='{}\nSize: {}'.format(prices[i], '/'.join(sizes[i])),
+            text='{}\nSize: {}\nขายแล้ว {}'.format(prices[i], '/'.join(sizes[i]), amounts[i]),
             actions=[
                 MessageAction(
                     label='เลือกไซส์',
@@ -290,6 +318,7 @@ def showItem(intent, reply_token, brand, id):
             columns=carousel_col
         )
     )
+    
     line_bot_api.reply_message(reply_token, carousel_template_message)
     # line_bot_api.push_message(uid, carousel_template_message)
 
