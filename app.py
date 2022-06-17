@@ -1,7 +1,7 @@
 from flask import Flask, request
 from linebot.models import *
-from linebot import *
-import test
+from linebotfn import *
+import linebotfn
 import json
 import re
 
@@ -43,21 +43,21 @@ def callback():
         brand = req["queryResult"]["parameters"]["Brands"]
         product = req["queryResult"]["parameters"]["ProductName"]
         if brand != "":
-            test.showItem(intent, reply_token, brand, id)
+            linebotfn.showItem(intent, reply_token, brand, id)
         else:
-            test.showItem(intent, reply_token, product, id)
+            linebotfn.showItem(intent, reply_token, product, id)
 
 
 
     elif intent == 'SelectSizes':
         product = req["queryResult"]["parameters"]["ProductName"]
-        test.selectSizes(intent, reply_token, product, id)
+        linebotfn.selectSizes(intent, reply_token, product, id)
 
     elif intent == 'ConfirmSize':
         product = req["queryResult"]["outputContexts"][1]["parameters"]["ProductName"]
         size = req["queryResult"]["parameters"]["Size"]
         # size = req["queryResult"]["parameters"]["Sizing"]
-        test.showBuyDetail(intent, reply_token, product, size, id)
+        linebotfn.showBuyDetail(intent, reply_token, product, size, id)
 
     elif intent == 'Shipping Address':
         for item in req["queryResult"]["outputContexts"]:
@@ -75,15 +75,15 @@ def callback():
         address = req["queryResult"]["parameters"]["address"]
         zip_code = req["queryResult"]["parameters"]["zip-code"]
         phone_no = req["queryResult"]["parameters"]["phone-number"]
-        test.ShippingAddress(id, reply_token, product, size, customer, address, zip_code, phone_no)
+        linebotfn.ShippingAddress(id, reply_token, product, size, customer, address, zip_code, phone_no)
 
     elif intent == 'Order Number':
         orderID = req["queryResult"]["parameters"]["OrderID"]
         # print(orderID)
-        test.CheckStatus(reply_token, orderID)
+        linebotfn.CheckStatus(reply_token, orderID)
 
     elif intent == 'Sole Shields' or intent == 'Shoes Spa':
-        test.Service(reply_token, id, intent)
+        linebotfn.Service(reply_token, id, intent)
     #     test.reserveService(reply_token)
 
     elif intent == 'Confirm Reserve':
@@ -95,16 +95,16 @@ def callback():
 
         time = req["queryResult"]["parameters"]["time"]
         date = req["queryResult"]["parameters"]["date"]
-        test.ReserveService(reply_token, date, time, service, disname)
+        linebotfn.ReserveService(reply_token, date, time, service, disname)
 
     elif intent == 'Send Shoes to The Shop':
-        test.SentShoes(reply_token)
+        linebotfn.SentShoes(reply_token)
 
     elif intent == 'Recommend Products':
-        test.RecommendProduct(reply_token)
+        linebotfn.RecommendProduct(reply_token)
 
     elif intent == 'How To Use':
-        test.HowtoUse(id, reply_token)
+        linebotfn.HowtoUse(id, reply_token)
 
     return 'OK'
 

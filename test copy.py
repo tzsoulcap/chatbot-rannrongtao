@@ -4,7 +4,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pprint import pprint
 import re
 from linebot.models import *
-from linebot import *
+from linebotfn import *
 import qrcode
 import time
 from datetime import datetime

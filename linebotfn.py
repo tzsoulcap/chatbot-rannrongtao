@@ -791,7 +791,7 @@ def CheckStatus(reply_token, orderID):
           },
           {
             "type": "text",
-            "text": "1 day",
+            "text": "1 วัน",
             "gravity": "center",
             "flex": 4,
             "size": "xs",
@@ -895,7 +895,7 @@ def CheckStatus(reply_token, orderID):
           },
           {
             "type": "text",
-            "text": "2-3 days",
+            "text": "2-3 วัน",
             "gravity": "center",
             "flex": 4,
             "size": "xs",
